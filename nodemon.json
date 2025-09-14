@@ -1,0 +1,7 @@
+{
+  "watch": ["cmd", "internal", "config", "db", "models", "router", "services", "repositories"],
+  "ext": "go",
+  "ignore": ["tmp/*", "vendor/*", "node_modules/*"],
+  "exec": "go run ./cmd/server",
+  "signal": "SIGKILL"
+}

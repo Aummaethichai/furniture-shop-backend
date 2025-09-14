@@ -11,10 +11,13 @@ import (
 
 var DB *gorm.DB
 
-func Connect(dsn string) {
+func ConnectPostgres(cfg *config.DatabaseConfig) *gorm.DB {
 	var err error
-	cfg := config.LoadConfig()
-	DB, err = gorm.Open(postgres.Open(cfg.Database.DSN), &gorm.Config{})
+	cfg.BuildPostgresDSN()
+	// cfg := config.LoadConfig()
+	DB, err = gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	// 	Logger: logger.Default.LogMode(logger.Info),
+	// })
 	if err != nil {
 		log.Fatal("❌ failed to connect database: ", err)
 	}
@@ -25,4 +28,6 @@ func Connect(dsn string) {
 		log.Fatal("❌ migration failed: ", err)
 	}
 	log.Println("✅ Migration success")
+
+	return DB
 }

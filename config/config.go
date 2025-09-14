@@ -17,12 +17,8 @@ func LoadConfig() *Config {
 	// run main
 	v.SetConfigName(".env")
 	v.SetConfigType("env")
-	v.AddConfigPath("../..")
+	v.AddConfigPath(".") // หาใน root project
 	v.AutomaticEnv()
-	// v.SetConfigFile(".env")
-	// v.AddConfigPath(".")      // หาใน root project
-	// v.AddConfigPath("./tmp")  // หาใน tmp ด้วย
-	// v.AutomaticEnv()
 
 	if err := v.ReadInConfig(); err != nil {
 		log.Fatalf("Error loading config: %v", err)
@@ -49,7 +45,7 @@ func LoadConfig() *Config {
 	}
 
 	// generate DSN
-	cfg.Database.BuildDSN()
+	// cfg.Database.BuildDSN()
 	// log.Println("✅ Config loaded", cfg)
 	return cfg
 }

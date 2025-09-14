@@ -13,9 +13,13 @@ func main() {
 
 	// connect DB
 	cfg := config.LoadConfig()
+	pg := database.ConnectPostgres(&cfg.Database)
+	sqlDB, err := pg.DB()
+	if err != nil {
+		log.Fatalf("failed to get sql.DB from gorm.DB: %v", err)
+	}
+	defer sqlDB.Close()
 
-	// connect
-	database.Connect(cfg.Database.DSN)
 
 	app := fiber.New()
 

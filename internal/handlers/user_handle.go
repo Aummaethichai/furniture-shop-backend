@@ -23,7 +23,7 @@ func Register(c *fiber.Ctx) error {
 			"error": "Cannot parse JSON",
 		})
 	}
-
+	
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
