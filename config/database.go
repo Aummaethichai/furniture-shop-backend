@@ -14,7 +14,7 @@ type DatabaseConfig struct {
 
 func (c *DatabaseConfig) BuildPostgresDSN() {
 	c.DSN = fmt.Sprintf(
-        "host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=Asia/Bangkok",
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=Asia/Bangkok",
 		c.Host, c.User, c.Password, c.Name, c.Port, c.SSLMode,
 	)
 }

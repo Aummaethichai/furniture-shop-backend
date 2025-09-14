@@ -2,28 +2,36 @@ package handlers
 
 import (
 	"furniture-shop-backend/internal/database"
+	"furniture-shop-backend/internal/dto"
 	models "furniture-shop-backend/internal/models"
+	"furniture-shop-backend/internal/services"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Register handles user registration
-func Register(c *fiber.Ctx) error {
-	type Request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Name     string `json:"name"`
-		Role     string `json:"role"` // admin, staff, customer
-	}
+type UserHandler struct {
+	validator *validator.Validate
+	service   *services.UserService
+}
 
-	var req Request
+func NewUserHandler(s *services.UserService) *UserHandler {
+	return &UserHandler{
+		service:   s,
+		validator: validator.New(),
+	}
+}
+
+func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
+	var req dto.CreateUserRequest
+
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Cannot parse JSON",
 		})
 	}
-	
+
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -46,28 +54,38 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status_code": fiber.StatusCreated,
-		"status_message":	"Success",
-		"status":	"OK",
-		"message":	"User registered successfully",
-		"data":	user,
+		"status_code":    fiber.StatusCreated,
+		"status_message": "Success",
+		"status":         "OK",
+		"message":        "User registered successfully",
+		"data":           user,
 	})
 }
 
-// func (h *UserHandler) Register(c *fiber.Ctx) error {
-//     var body struct {
-//         Email    string `json:"email"`
-//         Name     string `json:"name"`
-//         Password string `json:"password"`
-//     }
-//     if err := c.BodyParser(&body); err != nil {
-//         return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
-//     }
+func (h *UserHandler) FindUserByID(c *fiber.Ctx) error {
+	req := dto.FindUserRequest{
+		ID: c.Params("id"),
+	}
 
-//     user, err := h.service.Register(body.Email, body.Name, body.Password)
-//     if err != nil {
-//         return c.Status(400).JSON(fiber.Map{"error": err.Error()})
-//     }
+	// ✅ validate dto
+	if err := h.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status_code": fiber.StatusBadRequest,
+			// "status_message": "Bad Request",
+			"status": "Fail",
+			"error":  err.Error(),
+		})
+	}
 
-//     return c.Status(201).JSON(user)
-// }
+	user, err := h.service.FindUserByID(req.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status_code": fiber.StatusBadRequest,
+			// "status_message": err.Error(),
+			"status": "Fail",
+			"error":  err.Error(),
+		})
+	}
+
+	return c.JSON(user)
+}
