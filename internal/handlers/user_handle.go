@@ -89,3 +89,17 @@ func (h *UserHandler) FindUserByID(c *fiber.Ctx) error {
 
 	return c.JSON(user)
 }
+
+func (h *UserHandler) FindAllUser(c *fiber.Ctx) error {
+	users, err := h.service.FindAllUser()
+	if err != nil {
+		return dto.ResponseInternalServerError(c, "failed to fetch users", err.Error())
+	}
+
+	// ถ้าอยาก handle response แบบ users ไม่พบข้อมูลใช้แบบนี้ได้
+	// if len(users) == 0 {
+	// 	return c.SendString("ไม่พบข้อมูล")
+	// }
+
+	return dto.ResponseOK(c, "users fetched successfully", users)
+}

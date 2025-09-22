@@ -4,7 +4,7 @@ import (
 	"furniture-shop-backend/config"
 	"furniture-shop-backend/internal/database"
 	"furniture-shop-backend/internal/handlers"
-	"furniture-shop-backend/internal/repositories"
+	repos "furniture-shop-backend/internal/repositories"
 	"furniture-shop-backend/internal/router"
 	"furniture-shop-backend/internal/services"
 	"log"
@@ -16,13 +16,12 @@ func main() {
 
 	// connect DB
 	cfg := config.LoadConfig()
-	pg := database.ConnectPostgres(&cfg.Database)
+	pg := database.ConnectPostgres(&cfg.PostgresDB)
 	sqlDB, err := pg.DB()
 	if err != nil {
 		log.Fatalf("failed to get sql.DB from gorm.DB: %v", err)
 	}
 	defer sqlDB.Close()
-
 
 	// repo
 	userRepo := repos.NewUserRepository(pg)
@@ -41,7 +40,7 @@ func main() {
 
 	// setup router
 	router.SetupRoutes(app, &router.Handlers{
-		UserHandler:    userHandler,
+		UserHandler: userHandler,
 		// ProductHandler: productHandler,
 	})
 

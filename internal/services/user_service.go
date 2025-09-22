@@ -52,3 +52,22 @@ func (s *UserService) FindUserByID(id string) (dto.UserResponse, error) {
 		Role:  data.Role,
 	}, nil
 }
+
+func (s *UserService) FindAllUser() ([]dto.UserResponse, error) {
+	users, err := s.repo.FindAllUser()
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]dto.UserResponse, 0, len(users))
+	for _, user := range users {
+		res = append(res, dto.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Name:  user.Name,
+			Role:  user.Role,
+		})
+	}
+
+	return res, nil
+}

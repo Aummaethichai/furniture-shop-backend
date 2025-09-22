@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Database DatabaseConfig
+	PostgresDB DatabaseConfig
 	// Minio    MinioConfig
 	// JWT      JWTConfig
 }
@@ -17,7 +17,7 @@ func LoadConfig() *Config {
 	// run main
 	v.SetConfigName(".env")
 	v.SetConfigType("env")
-	v.AddConfigPath(".") // หาใน root project
+	v.AddConfigPath("../../") // หาใน root project
 	v.AutomaticEnv()
 
 	if err := v.ReadInConfig(); err != nil {
@@ -25,7 +25,7 @@ func LoadConfig() *Config {
 	}
 
 	cfg := &Config{
-		Database: DatabaseConfig{
+		PostgresDB: DatabaseConfig{
 			Host:     v.GetString("DB_HOST"),
 			Port:     v.GetInt("DB_PORT"),
 			User:     v.GetString("DB_USER"),
