@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -9,7 +10,7 @@ import (
 type Config struct {
 	PostgresDB DatabaseConfig
 	// Minio    MinioConfig
-	// JWT      JWTConfig
+	JWT JWTConfig
 }
 
 func LoadConfig() *Config {
@@ -33,14 +34,18 @@ func LoadConfig() *Config {
 			Name:     v.GetString("DB_NAME"),
 			SSLMode:  v.GetString("DB_SSLMODE"),
 		},
+		JWT: JWTConfig{
+			Secret:   v.GetString("JWT_SECRET"),
+			Issuer:   "Kobkam",
+			Audience: "furniture-shop",
+			TTL:      time.Hour * 72,
+			Alg:      "HS256",
+		},
 		// Minio: MinioConfig{
 		// 	Endpoint:  v.GetString("MINIO_ENDPOINT"),
 		// 	AccessKey: v.GetString("MINIO_ACCESS_KEY"),
 		// 	SecretKey: v.GetString("MINIO_SECRET_KEY"),
 		// 	Bucket:    v.GetString("MINIO_BUCKET"),
-		// },
-		// JWT: JWTConfig{
-		// 	Secret: v.GetString("JWT_SECRET"),
 		// },
 	}
 

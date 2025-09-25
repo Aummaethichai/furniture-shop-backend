@@ -35,9 +35,7 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to hash password",
-		})
+		return dto.ResponseBadRequest(c, "Failed", err.Error())
 	}
 
 	user := models.User{
@@ -48,18 +46,10 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create user",
-		})
+		return dto.ResponseBadRequest(c, err.Error(), nil)
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status_code":    fiber.StatusCreated,
-		"status_message": "Success",
-		"status":         "OK",
-		"message":        "User registered successfully",
-		"data":           user,
-	})
+	return dto.ResponseCreated(c, "User registered successfully", user)
 }
 
 func (h *UserHandler) FindUserByID(c *fiber.Ctx) error {
@@ -69,22 +59,12 @@ func (h *UserHandler) FindUserByID(c *fiber.Ctx) error {
 
 	// ✅ validate dto
 	if err := h.validator.Struct(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status_code": fiber.StatusBadRequest,
-			// "status_message": "Bad Request",
-			"status": "Fail",
-			"error":  err.Error(),
-		})
+		return dto.ResponseBadRequest(c, "Validation failed", err.Error())
 	}
 
 	user, err := h.service.FindUserByID(req.ID)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status_code": fiber.StatusBadRequest,
-			// "status_message": err.Error(),
-			"status": "Fail",
-			"error":  err.Error(),
-		})
+		return dto.ResponseBadRequest(c, "User not found", err.Error())
 	}
 
 	return c.JSON(user)

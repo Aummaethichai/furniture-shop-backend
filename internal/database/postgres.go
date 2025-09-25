@@ -36,7 +36,7 @@ func ConnectPostgres(cfg *config.DatabaseConfig) *gorm.DB {
 	}
 	log.Println("✅ Database connected")
 
-	err = DB.AutoMigrate(&models.User{})
+	err = DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Category{})
 	if err != nil {
 		panic("❌ migration failed")
 		// log.Fatal("❌ migration failed: ", err)
